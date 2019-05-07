@@ -128,7 +128,8 @@ def deep_q_learning(env,
 
 			minibatch = np.sample(replay_memory, batch_size)
 			states, actions, rewards, next_states, dones = replay_memory
-			targets = rewards + discount_factor * np.max(target_estimator.predict(next_states), axis=1)
+			selection_actions = np.argmax(q_estimator.predict(next_states), axis=1)
+			targets = rewards + discount_factor * (target_estimator.predict(next_states)[:, selection_action])
 			q_estimator.update(states, actions, targets)
 
 			if done:
@@ -145,6 +146,7 @@ stats = deep_q_learning(env,
 						q_estimator=q_estimator, 
 						target_estimator=target_estimator, 
 						num_episodes=10000)
+
 
 
 
