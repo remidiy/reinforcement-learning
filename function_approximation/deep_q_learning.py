@@ -95,6 +95,8 @@ def deep_q_learning(env,
 	state = env.reset()
 
 	for i in range(replay_memory_init_size):
+		print('\replay: {}'.format(i))
+		sys.stdout.flush()
 		epsilon = epsilons[min(i, epsilon_decay_steps-1)]
 		action_probs = policy(state, epsilon)
 		action = np.random.choice(valid_actions, p=action_probs)
