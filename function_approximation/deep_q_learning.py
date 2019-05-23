@@ -95,7 +95,7 @@ def deep_q_learning(env,
 	state = env.reset()
 
 	for i in range(replay_memory_init_size):
-		print('\replay: {}'.format(i))
+		print('\rreplay: {}/{}'.format(i, replay_memory_init_size), end='')
 		sys.stdout.flush()
 		epsilon = epsilons[min(i, epsilon_decay_steps-1)]
 		action_probs = policy(state, epsilon)
