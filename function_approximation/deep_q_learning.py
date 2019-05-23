@@ -126,7 +126,7 @@ def deep_q_learning(env,
             stats.episode_rewards[episode] += reward
             stats.episode_lengths[episode] = t
 
-            minibatch = np.sample(replay_memory, batch_size)
+            minibatch = np.random.sample(replay_memory, batch_size)
             states, actions, rewards, next_states, dones = minibatch
             targets = rewards + discount_factor * np.amax(target_estimator.predict(next_states), axis=1)
             q_estimator.update(states, actions, targets)
