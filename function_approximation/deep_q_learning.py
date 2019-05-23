@@ -8,8 +8,6 @@ import sys
 import tensorflow as tf
 from tensorflow.keras import models, layers
 
-
-
 if "../" not in sys.path:
   sys.path.append("../")
 
@@ -107,7 +105,8 @@ def deep_q_learning(env,
 		else:
 			state = next_state
 
-	
+	print('recording experience completed.')
+
 	for episode in range(num_episode):
 		state = env.reset()
 
