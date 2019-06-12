@@ -118,9 +118,6 @@ def deep_q_learning(env,
 			if i % 1000 == 0:
 				with open(os.path.join(replay_path, 'replay-{}.pickle'.format(i)), 'wb') as f:
 					pickle.dump(replay_memory[i-1000: i], f)
-			# if i % 1000 == 0:
-			# 	pickle.dump(replay_memory[i - 1000: i], f)
-			# 	f.flush()
 
 	print('recording experience completed.')
 
