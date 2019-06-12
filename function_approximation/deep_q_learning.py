@@ -127,6 +127,7 @@ def deep_q_learning(env,
 
 	print('recording experience completed.')
 
+	replay_memory = np.array(replay_memory)
 	for episode in range(num_episodes):
 		state = env.reset()
 
@@ -163,10 +164,13 @@ def deep_q_learning(env,
 target_estimator = Estimator()
 q_estimator = Estimator()
 
-stats = deep_q_learning(env, 
+stats = deep_q_learning(env,
 						q_estimator=q_estimator,
 						target_estimator=target_estimator,
 						num_episodes=10000)
+
+with open('stats.pickle', 'wb') as f:
+	pickle.dump(stats, f)
 
 
 
