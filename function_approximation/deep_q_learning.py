@@ -93,9 +93,11 @@ def deep_q_learning(env,
 	if not os.path.exists(replay_path):
 		os.mkdir(replay_path)
 
-	if os.path.exists(os.path.join(replay_path, 'replay-1000.pickle')):
+	if os.path.exists(os.path.join(replay_path, 'replay-30000.pickle')):
 		print('loading persisted pickle file')
 		for p in os.listdir(replay_path):
+			print('\r{}'.format(p), end='')
+			sys.stdout.flush()
 			with open(os.path.join(replay_path, p), 'rb') as r:
 				sub_memory = pickle.load(r)
 				replay_memory.extend(sub_memory)
@@ -129,7 +131,7 @@ def deep_q_learning(env,
 			epsilon = epsilons[min(steps, epsilon_decay_steps-1)]
 
 			if steps % update_target_estimator_every == 0:
-				target_estimator.set_weights(q_estimator.get_weights())
+				target_estimator.load_weights(q_estimator.get_weights())
 
 			action_probs = policy(state, epsilon)
 			action = np.random.choice(valid_actions, p=action_probs)
