@@ -96,7 +96,7 @@ def deep_q_learning(env,
 	if os.path.exists(os.path.join(replay_path, 'replay-1000.pickle')):
 		print('loading persisted pickle file')
 		for p in os.listdir(replay_path):
-			with open(os.path.join(replay_path, p), 'r') as r:
+			with open(os.path.join(replay_path, p), 'rb') as r:
 				sub_memory = pickle.load(r)
 				replay_memory.extend(sub_memory)
 	else:
@@ -114,7 +114,7 @@ def deep_q_learning(env,
 				state = next_state
 
 			if i % 1000 == 0:
-				with open(os.path.join(replay_path, 'replay-{}.pickle'.format(i)), 'w') as f:
+				with open(os.path.join(replay_path, 'replay-{}.pickle'.format(i)), 'wb') as f:
 					pickle.dump(replay_memory[i-1000: i], f)
 			# if i % 1000 == 0:
 			# 	pickle.dump(replay_memory[i - 1000: i], f)
