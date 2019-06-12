@@ -4,7 +4,7 @@ import numpy as np
 import os
 import sys
 import tensorflow as tf
-import h5py
+import pickle
 from tensorflow.keras import models, layers
 
 if "../" not in sys.path:
@@ -93,22 +93,21 @@ def deep_q_learning(env,
 	if not os.path.exists(replay_path):
 		os.mkdir(replay_path)
 
-	with open(os.path.join(replay_path, 'replay.hdf5'), 'w') as f:
-		for i in range(1, replay_memory_init_size+1):
-			print('\rreplay: {}/{}'.format(i, replay_memory_init_size), end='')
-			sys.stdout.flush()
-			epsilon = epsilons[min(i, epsilon_decay_steps-1)]
-			action_probs = policy(state, epsilon)
-			action = np.random.choice(valid_actions, p=action_probs)
-			next_state, reward, done, _ = env.step(action)
-			replay_memory.append((state, action, reward, next_state, done))
-			if done:
-				state = env.reset()
-			else:
-				state = next_state
+	for i in range(1, replay_memory_init_size+1):
+		print('\rreplay: {}/{}'.format(i, replay_memory_init_size), end='')
+		sys.stdout.flush()
+		epsilon = epsilons[min(i, epsilon_decay_steps-1)]
+		action_probs = policy(state, epsilon)
+		action = np.random.choice(valid_actions, p=action_probs)
+		next_state, reward, done, _ = env.step(action)
+		replay_memory.append((state, action, reward, next_state, done))
+		if done:
+			state = env.reset()
+		else:
+			state = next_state
 
-			if i % 1000 == 0:
-				f.create_dataset('breakout-{}'.format(i), replay_memory[i-1000:i])
+	with open(os.path.join(replay_path, 'replay.pickle'), 'w') as f:
+		pickle.dump(replay_memory, f)
 
 	print('recording experience completed.')
 
