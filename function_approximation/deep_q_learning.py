@@ -94,7 +94,7 @@ def deep_q_learning(env,
 		os.mkdir(replay_path)
 
 	with open(os.path.join(replay_path, 'replay.hdf5'), 'w') as f:
-		for i in range(replay_memory_init_size):
+		for i in range(1, replay_memory_init_size+1):
 			print('\rreplay: {}/{}'.format(i, replay_memory_init_size), end='')
 			sys.stdout.flush()
 			epsilon = epsilons[min(i, epsilon_decay_steps-1)]
