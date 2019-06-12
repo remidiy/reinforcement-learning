@@ -21,6 +21,12 @@ class Estimator(object):
 	def __init__(self):
 		self.model = self._build_model()
 
+	def load_weights(self, weights):
+		self.model.load_weights(weights)
+
+	def get_weights(self):
+		return self.model.get_weights()
+
 	@staticmethod
 	def state_processor(state):
 		output = tf.image.rgb_to_grayscale(state)
