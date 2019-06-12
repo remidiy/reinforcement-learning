@@ -142,8 +142,8 @@ def deep_q_learning(env,
 			next_state, reward, done, _ = env.step(action)
 
 			if len(replay_memory) == replay_memory_size:
-				replay_memory.pop(0)
-			replay_memory.append((state, action, reward, next_state, done))
+				replay_memory = np.delete(replay_memory, 0, 0)
+			np.append(replay_memory, (state, action, reward, next_state, done))
 
 			stats.episode_rewards[episode] += reward
 			stats.episode_lengths[episode] = t
