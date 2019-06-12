@@ -127,7 +127,8 @@ def deep_q_learning(env,
 
 	print('recording experience completed.')
 
-	replay_memory = np.array(replay_memory).reshape(1, replay_memory.shape)
+	replay_memory = np.array(replay_memory)
+	replay_memory = replay_memory.reshape(1, replay_memory.shape)
 	for episode in range(num_episodes):
 		state = env.reset()
 
@@ -147,7 +148,6 @@ def deep_q_learning(env,
 
 			stats.episode_rewards[episode] += reward
 			stats.episode_lengths[episode] = t
-
 			print(replay_memory.shape)
 			minibatch = np.random.choice(replay_memory, batch_size)
 			states, actions, rewards, next_states, dones = minibatch
