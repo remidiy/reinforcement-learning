@@ -93,10 +93,12 @@ def deep_q_learning(env,
 	if not os.path.exists(replay_path):
 		os.mkdir(replay_path)
 
-	if os.path.exists(os.path.join(replay_path, 'replay.pickle')):
+	if os.path.exists(os.path.join(replay_path, 'replay-1000.pickle')):
 		print('loading persisted pickle file')
-		with open(os.path.join(replay_path, 'replay.pickle'), 'r') as r:
-			replay_memory = pickle.load(r)
+		for p in os.listdir(replay_path):
+			with open(os.path.join(replay_path, p), 'r') as r:
+				sub_memory = pickle.load(r)
+				replay_memory.extend(sub_memory)
 	else:
 		for i in range(1, replay_memory_init_size+1):
 			print('\rreplay: {}/{}'.format(i, replay_memory_init_size), end='')
@@ -111,8 +113,12 @@ def deep_q_learning(env,
 			else:
 				state = next_state
 
-		with open(os.path.join(replay_path, 'replay.pickle'), 'w') as f:
-			pickle.dump(replay_memory, f)
+			if i % 1000 == 0:
+				with open(os.path.join(replay_path, 'replay-{}.pickle'.format(i)), 'w') as f:
+					pickle.dump(replay_memory[i-1000: i], f)
+			# if i % 1000 == 0:
+			# 	pickle.dump(replay_memory[i - 1000: i], f)
+			# 	f.flush()
 
 	print('recording experience completed.')
 
