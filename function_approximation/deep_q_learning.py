@@ -127,7 +127,7 @@ def deep_q_learning(env,
 
 	print('recording experience completed.')
 
-	replay_memory = np.array(replay_memory)
+	replay_memory = np.array(replay_memory).reshape(1, replay_memory.shape)
 	for episode in range(num_episodes):
 		state = env.reset()
 
