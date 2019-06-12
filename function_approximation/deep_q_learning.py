@@ -93,21 +93,26 @@ def deep_q_learning(env,
 	if not os.path.exists(replay_path):
 		os.mkdir(replay_path)
 
-	for i in range(1, replay_memory_init_size+1):
-		print('\rreplay: {}/{}'.format(i, replay_memory_init_size), end='')
-		sys.stdout.flush()
-		epsilon = epsilons[min(i, epsilon_decay_steps-1)]
-		action_probs = policy(state, epsilon)
-		action = np.random.choice(valid_actions, p=action_probs)
-		next_state, reward, done, _ = env.step(action)
-		replay_memory.append((state, action, reward, next_state, done))
-		if done:
-			state = env.reset()
-		else:
-			state = next_state
+	if os.path.exists(os.path.join(replay_path, 'replay.pickle')):
+		print('loading persisted pickle file')
+		with open(os.path.join(replay_path, 'replay.pickle'), 'r') as r:
+			replay_memory = pickle.load(os.path.join(replay_path, 'replay.pickle'))
+	else:
+		for i in range(1, replay_memory_init_size+1):
+			print('\rreplay: {}/{}'.format(i, replay_memory_init_size), end='')
+			sys.stdout.flush()
+			epsilon = epsilons[min(i, epsilon_decay_steps-1)]
+			action_probs = policy(state, epsilon)
+			action = np.random.choice(valid_actions, p=action_probs)
+			next_state, reward, done, _ = env.step(action)
+			replay_memory.append((state, action, reward, next_state, done))
+			if done:
+				state = env.reset()
+			else:
+				state = next_state
 
-	with open(os.path.join(replay_path, 'replay.pickle'), 'w') as f:
-		pickle.dump(replay_memory, f)
+		with open(os.path.join(replay_path, 'replay.pickle'), 'w') as f:
+			pickle.dump(replay_memory, f)
 
 	print('recording experience completed.')
 
