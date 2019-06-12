@@ -1,22 +1,23 @@
 import gym
 import itertools
 import numpy as np
-
+import os
 import sys
 import tensorflow as tf
+import h5py
 from tensorflow.keras import models, layers
 
 if "../" not in sys.path:
-  sys.path.append("../")
+	sys.path.append("../")
 
 from lib import plotting
 env = gym.envs.make("Breakout-v0")
 
 valid_actions = [0, 1, 2, 3]
+replay_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'replays')
 
 
-class Estimator():
-
+class Estimator(object):
 	def __init__(self):
 		self.model = self._build_model()
 
@@ -70,13 +71,13 @@ def deep_q_learning(env,
 					q_estimator,
 					target_estimator,
 					num_episodes,
-					replay_memory_size=500000,
+					replay_memory_size=50000,
 					replay_memory_init_size=50000,
 					update_target_estimator_every=10000,
 					discount_factor=0.99,
 					epsilon_start=1.0,
 					epsilon_end=0.1,
-					epsilon_decay_steps=500000,
+					epsilon_decay_steps=50000,
 					batch_size=32,
 					record_video_every=50):
 
@@ -89,18 +90,25 @@ def deep_q_learning(env,
 
 	state = env.reset()
 
-	for i in range(replay_memory_init_size):
-		print('\rreplay: {}/{}'.format(i, replay_memory_init_size), end='')
-		sys.stdout.flush()
-		epsilon = epsilons[min(i, epsilon_decay_steps-1)]
-		action_probs = policy(state, epsilon)
-		action = np.random.choice(valid_actions, p=action_probs)
-		next_state, reward, done, _ = env.step(action)
-		replay_memory.append((state, action, reward, next_state, done))
-		if done:
-			state = env.reset()
-		else:
-			state = next_state
+	if not os.path.exists(replay_path):
+		os.mkdir(replay_path)
+
+	with open(os.path.join(replay_path, 'replay.hdf5'), 'w') as f:
+		for i in range(replay_memory_init_size):
+			print('\rreplay: {}/{}'.format(i, replay_memory_init_size), end='')
+			sys.stdout.flush()
+			epsilon = epsilons[min(i, epsilon_decay_steps-1)]
+			action_probs = policy(state, epsilon)
+			action = np.random.choice(valid_actions, p=action_probs)
+			next_state, reward, done, _ = env.step(action)
+			replay_memory.append((state, action, reward, next_state, done))
+			if done:
+				state = env.reset()
+			else:
+				state = next_state
+
+			if i % 1000 == 0:
+				f.create_dataset('breakout-{}'.format(i), replay_memory[i-1000:i])
 
 	print('recording experience completed.')
 
