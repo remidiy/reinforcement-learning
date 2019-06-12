@@ -21,8 +21,8 @@ class Estimator(object):
 	def __init__(self):
 		self.model = self._build_model()
 
-	def load_weights(self, weights):
-		self.model.load_weights(weights)
+	def set_weights(self, weights):
+		self.model.set_weights(weights)
 
 	def get_weights(self):
 		return self.model.get_weights()
@@ -134,7 +134,7 @@ def deep_q_learning(env,
 			epsilon = epsilons[min(steps, epsilon_decay_steps-1)]
 
 			if steps % update_target_estimator_every == 0:
-				target_estimator.load_weights(q_estimator.get_weights())
+				target_estimator.set_weights(q_estimator.get_weights())
 
 			action_probs = policy(state, epsilon)
 			action = np.random.choice(valid_actions, p=action_probs)
