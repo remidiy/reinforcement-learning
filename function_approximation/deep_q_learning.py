@@ -96,7 +96,7 @@ def deep_q_learning(env,
 	if os.path.exists(os.path.join(replay_path, 'replay.pickle')):
 		print('loading persisted pickle file')
 		with open(os.path.join(replay_path, 'replay.pickle'), 'r') as r:
-			replay_memory = pickle.load(os.path.join(replay_path, 'replay.pickle'))
+			replay_memory = pickle.load(r)
 	else:
 		for i in range(1, replay_memory_init_size+1):
 			print('\rreplay: {}/{}'.format(i, replay_memory_init_size), end='')
