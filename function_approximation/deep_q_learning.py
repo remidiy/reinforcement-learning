@@ -4,6 +4,7 @@ import numpy as np
 import os
 import sys
 import tensorflow as tf
+import random
 import pickle
 from tensorflow.keras import models, layers
 
@@ -30,6 +31,7 @@ class Estimator(object):
 	@staticmethod
 	def state_processor(state):
 		output = tf.image.rgb_to_grayscale(state)
+		# print(output.shape)
 		output = tf.image.crop_to_bounding_box(output, 34, 0, 160, 160)
 		output = tf.image.resize(output, [84, 84], method=tf.image.ResizeMethod.NEAREST_NEIGHBOR)
 		# output = tf.squeeze(output)
@@ -38,8 +40,11 @@ class Estimator(object):
 
 	@staticmethod
 	def target_processor(action, target):
-		A = np.zeros(len(valid_actions), dtype=float)
-		A[action] = target
+		A = np.zeros(shape=(action.shape[0], len(valid_actions)), dtype=float)
+		# print(A.shape, action.shape, target.shape)
+		# print(action)
+		# print(target)
+		A[:, action] = target
 		return A
 
 	@staticmethod
@@ -60,7 +65,7 @@ class Estimator(object):
 		return self.model.predict(self.state_processor(state))
 
 	def update(self, state, action, target):
-		self.model.fit(self.state_processor(state), self.target_processor(target, action))
+		self.model.fit(self.state_processor(state), self.target_processor(action, target))
 
 
 def epsilon_greedy_policy(estimator, num_actions):
@@ -84,7 +89,7 @@ def deep_q_learning(env,
 					epsilon_start=1.0,
 					epsilon_end=0.1,
 					epsilon_decay_steps=50000,
-					batch_size=32,
+					batch_size=512,
 					record_video_every=50):
 
 	steps = 0
@@ -127,9 +132,11 @@ def deep_q_learning(env,
 
 	print('recording experience completed.')
 
-	replay_memory = np.array(replay_memory)
-	replay_memory = replay_memory.reshape(1, replay_memory.shape)
+	# replay_memory = np.array(replay_memory)
+	# replay_memory = replay_memory.reshape(replay_memory.shape[0], 1, replay_memory.shape[1])
+	# print(replay_memory.shape)
 	for episode in range(num_episodes):
+		
 		state = env.reset()
 
 		for t in itertools.count():
@@ -148,9 +155,13 @@ def deep_q_learning(env,
 
 			stats.episode_rewards[episode] += reward
 			stats.episode_lengths[episode] = t
-			print(replay_memory.shape)
-			minibatch = np.random.choice(replay_memory, batch_size)
-			states, actions, rewards, next_states, dones = minibatch
+
+			# minibatch_index = np.random.choice(range(replay_memory.shape[0]), batch_size)
+			# minibatch = replay_memory[minibatch_index]
+			minibatch = random.sample(list(replay_memory), batch_size)
+			states, actions, rewards, next_states, dones = map(np.array, zip(*minibatch))
+			# print('episode: {} --> {}/{}'.format(t, episode, num_episodes))
+			# print(np.array(next_states).shape)
 			targets = rewards + discount_factor * np.amax(target_estimator.predict(next_states), axis=1)
 			q_estimator.update(states, actions, targets)
 
