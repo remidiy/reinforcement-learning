@@ -138,7 +138,7 @@ def deep_q_learning(env,
 	for episode in range(num_episodes):
 		
 		state = env.reset()
-
+		
 		for t in itertools.count():
 			epsilon = epsilons[min(steps, epsilon_decay_steps-1)]
 
@@ -170,6 +170,10 @@ def deep_q_learning(env,
 			state = next_state
 			steps += 1
 
+		if episode % 1000 == 0:
+			with open('stats.pickle', 'wb') as f:
+				pickle.dump(stats, f)
+
 	return stats
 
 
@@ -180,9 +184,6 @@ stats = deep_q_learning(env,
 						q_estimator=q_estimator,
 						target_estimator=target_estimator,
 						num_episodes=10000)
-
-with open('stats.pickle', 'wb') as f:
-	pickle.dump(stats, f)
 
 
 
